@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details</title>
+    <link rel="stylesheet" href="../theme.css">
+    <link rel="stylesheet" href="../retailer/retailer.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="retailer-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h2>Retailer Panel</h2>
+            <nav>
+                <ul>
+                    <li><a href="all_orders.html">All Orders</a></li>
+                    <li><a href="product_details.html" class="active">Storage & Product Details</a></li>
+                    <li><a href="../login.html">Log Out</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <header class="head">
+                <h1>Product Details</h1>
+            </header>
+
+            <!-- Graphs Section -->
+            <section class="graphs-section">
+                <div class="graph">
+                    <canvas id="productCapacityGraph"></canvas>
+                </div>
+                <div class="graph">
+                    <canvas id="productLossGraph"></canvas>
+                </div>
+            </section>
+
+            <!-- Stats Section -->
+            <section class="stats-section">
+                <div class="stat-box">
+                    <h3>Total Capacity</h3>
+                    <p id="total-capacity">1000 kg</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Occupied Capacity</h3>
+                    <p id="occupied-capacity">750 kg</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Remaining Usable Capacity</h3>
+                    <p id="remaining-capacity">250 kg</p>
+                </div>
+                <div class="stat-box loss-box">
+                    <h3>Wasted Capacity</h3>
+                    <p id="wasted-capacity">50 kg</p>
+                </div>
+            </section>
+
+            <!-- Product List Section -->
+            <section id="product-list" class="section">
+                <h2>Product List</h2>
+                <button class="btn-primary" id="add-product-btn">Add New Product</button>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Shelf Life</th>
+                            <th>Product Capacity</th>
+                            <th>Loss Due to Damage</th>
+                            <th>Add Amount</th>
+                            <th>Reduce Amount</th>
+                            <th>Reduce Loss</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows populated dynamically via JS -->
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add New Product Modal (Retained Previous Functionality) -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Add New Product</h3>
+            <form id="new-product-form">
+                <label for="product-name">Product Name:</label>
+                <input type="text" id="product-name" placeholder="Enter product name" required>
+                <label for="shelf-life">Shelf Life:</label>
+                <input type="text" id="shelf-life" placeholder="e.g., 7 days" required>
+                <label for="product-capacity">Product Capacity (kg):</label>
+                <input type="number" id="product-capacity" placeholder="Enter capacity" required>
+                <button type="submit" class="btn-primary">Add Product</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const products = [
+            { name: 'Rice', shelfLife: '30 days', capacity: 100, loss: 5 },
+            { name: 'Tomato', shelfLife: '7 days', capacity: 90, loss: 10 },
+            { name: 'Brinjal', shelfLife: '10 days', capacity: 80, loss: 8 },
+            { name: 'Potato', shelfLife: '60 days', capacity: 70, loss: 4 },
+            { name: 'Cauliflower', shelfLife: '7 days', capacity: 60, loss: 6 },
+            { name: 'Cabbage', shelfLife: '7 days', capacity: 50, loss: 3 },
+            { name: 'Onion', shelfLife: '30 days', capacity: 40, loss: 2 },
+            { name: 'Lettuce', shelfLife: '5 days', capacity: 30, loss: 1 },
+            { name: 'Mushroom', shelfLife: '5 days', capacity: 20, loss: 0 },
+            { name: 'Corn', shelfLife: '30 days', capacity: 10, loss: 2 },
+            { name: 'Carrot', shelfLife: '20 days', capacity: 15, loss: 1 },
+            { name: 'Pepper', shelfLife: '20 days', capacity: 25, loss: 1 },
+        ];
+
+        const productTableBody = document.querySelector('#product-list table tbody');
+
+        function populateTable() {
+            productTableBody.innerHTML = '';
+            products.forEach((product, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product.name}</td>
+                    <td>${product.shelfLife}</td>
+                    <td>${product.capacity} kg</td>
+                    <td><input type="number" value="${product.loss}" onchange="updateLoss(${index}, this.value)"></td>
+                    <td><button class="btn-action" onclick="addAmount(${index})">Add</button></td>
+                    <td><button class="btn-action" onclick="reduceAmount(${index})">Reduce</button></td>
+                    <td><button class="btn-action" onclick="reduceLoss(${index})">Reduce</button></td>
+                `;
+                productTableBody.appendChild(row);
+            });
+            updateGraphs();
+        }
+
+        function addAmount(index) {
+            const amount = prompt(`Enter the amount to add for ${products[index].name}:`);
+            if (amount && !isNaN(amount)) {
+                products[index].capacity += parseInt(amount);
+                populateTable();
+            }
+        }
+
+        function reduceAmount(index) {
+            const amount = prompt(`Enter the amount to reduce for ${products[index].name}:`);
+            if (amount && !isNaN(amount)) {
+                products[index].capacity -= parseInt(amount);
+                if (products[index].capacity < 0) products[index].capacity = 0;
+                populateTable();
+            }
+        }
+
+        function reduceLoss(index) {
+            const loss = prompt(`Enter the loss amount to reduce for ${products[index].name}:`);
+            if (loss && !isNaN(loss)) {
+                products[index].loss -= parseInt(loss);
+                if (products[index].loss < 0) products[index].loss = 0;
+                populateTable();
+            }
+        }
+
+        const capacityCtx = document.getElementById('productCapacityGraph').getContext('2d');
+        const capacityGraph = new Chart(capacityCtx, {
+            type: 'bar',
+            data: {
+                labels: products.map(p => p.name),
+                datasets: [{
+                    label: 'Product Capacity (kg)',
+                    data: products.map(p => p.capacity),
+                    backgroundColor: 'rgba(58, 90, 64, 0.7)',
+                    borderWidth: 1,
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+
+        const lossCtx = document.getElementById('productLossGraph').getContext('2d');
+        const lossGraph = new Chart(lossCtx, {
+            type: 'bar',
+            data: {
+                labels: products.map(p => p.name),
+                datasets: [{
+                    label: 'Product Loss (kg)',
+                    data: products.map(p => p.loss),
+                    backgroundColor: 'rgba(231, 76, 60, 0.7)',
+                    borderWidth: 1,
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+
+        function updateGraphs() {
+            capacityGraph.data.datasets[0].data = products.map(p => p.capacity);
+            capacityGraph.update();
+
+            lossGraph.data.datasets[0].data = products.map(p => p.loss);
+            lossGraph.update();
+        }
+
+        document.querySelector('#new-product-form').addEventListener('submit', event => {
+            event.preventDefault();
+            const name = document.getElementById('product-name').value;
+            const shelfLife = document.getElementById('shelf-life').value;
+            const capacity = parseInt(document.getElementById('product-capacity').value);
+            products.push({ name, shelfLife, capacity, loss: 0 });
+            populateTable();
+        });
+
+        // Modal Logic
+        const modal = document.getElementById('product-modal');
+        const openModalBtn = document.getElementById('add-product-btn');
+        const closeModal = document.querySelector('.modal .close');
+
+        openModalBtn.addEventListener('click', () => {
+            modal.style.display = 'flex';
+        });
+
+        closeModal.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Initialize Table
+        populateTable();
+    </script>
+</body>
+</html>

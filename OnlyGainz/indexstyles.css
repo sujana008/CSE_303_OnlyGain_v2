@@ -1,0 +1,122 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Body and Background Styling */
+body {
+    background-color: #3b5f47;
+    color: #fff;
+    overflow-x: hidden;
+    position: relative;
+}
+
+.background-container {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    top: 0;
+    left: 0;
+}
+
+.bg-image {
+    position: absolute;
+    width: 50%;
+    opacity: 0.2;
+}
+
+#bg1 { top: 0; left: 0; }
+#bg2 { bottom: 0; right: 0; }
+#bg3 { top: 20%; left: 30%; }
+
+/* Top Panel */
+.top-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 10px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.logo img {
+    width: 60px;
+    filter: brightness(0) invert(1); /* Apply theme-based color to logo */
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: #e74c3c; /* Accent color */
+}
+
+/* Title Section */
+.title-section {
+    text-align: center;
+    margin: 100px auto 50px;
+}
+
+.title-section h1 {
+    font-size: 4rem;
+    color: #e74c3c;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+.title-section h3 {
+    font-size: 1.5rem;
+    color: #ddd;
+    margin-top: 10px;
+}
+
+/* Scattered Content Boxes */
+.content-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.content-box {
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 20px;
+    border: 1px solid #444;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.content-box:hover {
+    transform: translateY(-10px);
+}
+
+.content-box h2 {
+    margin-bottom: 10px;
+    color: #e74c3c;
+    font-size: 1.8rem;
+}
+
+.content-box p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #ccc;
+}

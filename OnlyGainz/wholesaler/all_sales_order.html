@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Sales Orders</title>
+    <link rel="stylesheet" href="../theme.css">
+    <link rel="stylesheet" href="./wholesaler.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="retailer-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h2>Wholesaler Panel</h2>
+            <nav>
+                <ul>
+                    <li><a href="wholesaler.html">Dashboard</a></li>
+                    <li><a href="storage_product_details.html">Storage & Product Details</a></li>
+                    <li><a href="all_sales_order.html" class="active">All Sales Order</a></li>
+                    <li><a href="../login.html">Log Out</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <header class="head">
+                <h1>All Sales Orders</h1>
+            </header>
+
+            <section class="graph-section">
+                <h2>Product Sales Overview</h2>
+                <canvas id="salesChart" width="400" height="200"></canvas>
+            </section>
+
+            <section class="order-list-section">
+                <h2>Orders List</h2>
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order Date</th>
+                            <th>Order Status</th>
+                            <th>Order Quantity</th>
+                            <th>Product Name</th>
+                            <th>Estimated Delivery</th>
+                            <th>Received Product Amount</th>
+                            <th>Weight Loss During Loading</th>
+                            <th>Location</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows will be dynamically populated here -->
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Updated data for the chart with product names and kg unit
+        const data = {
+            labels: [
+                'Rice', 'Tomato', 'Brinjal', 'Potato', 'Cauliflower', 'Cabbage', 
+                'Onion', 'Lettuce', 'Mushroom', 'Corn', 'Carrot', 'Pepper'
+            ],
+            datasets: [{
+                label: 'Monthly Sales (kg)',
+                data: [1500, 1200, 2000, 1800, 900, 1600, 1300, 1100, 1400, 1000, 1700, 800], // Sample sales data in kg
+                backgroundColor: [
+                    'rgba(255, 228, 181, 0.6)', // Rice - Light golden
+                    'rgba(255, 99, 132, 0.6)',  // Tomato - Red
+                    'rgba(153, 102, 255, 0.6)', // Brinjal - Purple
+                    'rgba(210, 180, 140, 0.6)', // Potato - Brown
+                    'rgba(255, 255, 255, 0.6)', // Cauliflower - White
+                    'rgba(144, 238, 144, 0.6)', // Cabbage - Green
+                    'rgba(219, 112, 147, 0.6)', // Onion - Purple-red
+                    'rgba(173, 255, 47, 0.6)',  // Lettuce - Light green
+                    'rgba(222, 184, 135, 0.6)', // Mushroom - Beige
+                    'rgba(255, 223, 0, 0.6)',   // Corn - Yellow
+                    'rgba(255, 165, 0, 0.6)',   // Carrot - Orange
+                    'rgba(50, 205, 50, 0.6)'    // Pepper - Bright green
+                ],
+                borderColor: [
+                    'rgba(255, 228, 181, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(210, 180, 140, 1)',
+                    'rgba(255, 255, 255, 1)',
+                    'rgba(144, 238, 144, 1)',
+                    'rgba(219, 112, 147, 1)',
+                    'rgba(173, 255, 47, 1)',
+                    'rgba(222, 184, 135, 1)',
+                    'rgba(255, 223, 0, 1)',
+                    'rgba(255, 165, 0, 1)',
+                    'rgba(50, 205, 50, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        const config = {
+            type: 'bar',
+            data: data,
+            options: {
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#333', // Match text color to theme
+                            font: {
+                                size: 14
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: '#333', // Match text color to theme
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#333', // Match text color to theme
+                            font: {
+                                size: 12
+                            },
+                            callback: function(value) {
+                                return value + ' kg'; // Append kg unit to y-axis values
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        const salesChart = new Chart(
+            document.getElementById('salesChart'),
+            config
+        );
+    </script>
+</body>
+</html>

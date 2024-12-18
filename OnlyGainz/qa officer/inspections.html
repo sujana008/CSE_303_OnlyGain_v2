@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inspection - QA Officer</title>
+    <link rel="stylesheet" href="../theme.css">
+    <link rel="stylesheet" href="./qa_officer.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="qa-officer-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h2>QA Officer Panel</h2>
+            <nav>
+                <ul>
+                    <li><a href="inspections.html" class="active">Inspections</a></li>
+                    <li><a href="loss_tracking_qa_officer.html">Loss Tracking</a></li>
+                    <li><a href="real_time_monitoring_qa_officer.html">Real Time Monitoring</a></li>
+                    <li><a href="../login.html">Log Out</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <header class="head">
+                <h1>Inspection</h1>
+            </header>
+
+            <!-- Year and Month Dropdown for Graphs -->
+            <section class="graph-filters">
+                <div>
+                    <label for="year-select">Select Year:</label>
+                    <select id="year-select">
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                        <option value="2022">2022</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="month-select">Select Month:</label>
+                    <select id="month-select">
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                        <!-- Add other months as needed -->
+                    </select>
+                </div>
+            </section>
+
+            <!-- Graphs Section -->
+            <section class="graphs-section">
+                <div class="graph">
+                    <canvas id="inspectionsPerYearGraph"></canvas>
+                </div>
+                <div class="graph">
+                    <canvas id="inspectionsPerMonthGraph"></canvas>
+                </div>
+            </section>
+
+            <!-- Inspection Schedule and Inspection Reports Section -->
+            <section class="inspection-segments">
+                <!-- Scheduled Inspections -->
+                <div class="inspection-schedule">
+                    <h2>Scheduled Inspections</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Scheduled Inspection Date</th>
+                                <th>Actual Inspection Date</th>
+                                <th>Inspection Frequency</th>
+                                <th>Inspection Checklist</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2024-12-20</td>
+                                <td></td>
+                                <td>Pending</td>
+                                <td><button>View Checklist</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Inspection Reports -->
+                <div class="inspection-reports">
+                    <h2>Inspection Reports</h2>
+                    <button class="btn-primary" id="add-report-btn">Add Inspection Report</button>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Inspection Date</th>
+                                <th>Quality Parameters</th>
+                                <th>Defects/Damage</th>
+                                <th>Hygiene Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Rows populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add New Report Modal -->
+    <div id="report-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Add Inspection Report</h3>
+            <form id="new-report-form">
+                <label for="inspection-date">Inspection Date:</label>
+                <input type="date" id="inspection-date" required>
+                <label for="temperature">Temperature:</label>
+                <input type="text" id="temperature" placeholder="Enter temperature" required>
+                <label for="humidity">Humidity:</label>
+                <input type="text" id="humidity" placeholder="Enter humidity" required>
+                <label for="defects">Defects/Damage:</label>
+                <textarea id="defects" placeholder="Enter defects or damage details" required></textarea>
+                <label for="hygiene-rating">Hygiene Rating:</label>
+                <input type="number" id="hygiene-rating" min="1" max="5" placeholder="Rate hygiene (1-5)" required>
+                <button type="submit" class="btn-primary">Add Report</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Modal Logic
+        const modal = document.getElementById('report-modal');
+        const openModalBtn = document.getElementById('add-report-btn');
+        const closeModal = document.querySelector('.modal .close');
+        const form = document.getElementById('new-report-form');
+        const tableBody = document.querySelector('.inspection-reports table tbody');
+
+        // Open Modal
+        openModalBtn.addEventListener('click', () => {
+            modal.style.display = 'flex';
+        });
+
+        // Close Modal
+        closeModal.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        // Close Modal on Outside Click
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Handle Form Submission
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const inspectionDate = document.getElementById('inspection-date').value;
+            const temperature = document.getElementById('temperature').value;
+            const humidity = document.getElementById('humidity').value;
+            const defects = document.getElementById('defects').value;
+            const hygieneRating = document.getElementById('hygiene-rating').value;
+
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${inspectionDate}</td>
+                <td>Temperature: ${temperature}, Humidity: ${humidity}</td>
+                <td>${defects}</td>
+                <td>${hygieneRating}</td>
+            `;
+            tableBody.appendChild(newRow);
+
+            modal.style.display = 'none'; // Close modal after adding the report
+        });
+
+        // Graph Data and Logic
+        const inspectionsPerYearCtx = document.getElementById('inspectionsPerYearGraph').getContext('2d');
+        const inspectionsPerYearGraph = new Chart(inspectionsPerYearCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Inspections Per Month',
+                    data: [5, 10, 8, 12, 7, 6, 9, 11, 10, 15, 8, 7],
+                    backgroundColor: 'rgba(58, 90, 64, 0.7)'
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+
+        const inspectionsPerMonthCtx = document.getElementById('inspectionsPerMonthGraph').getContext('2d');
+        const inspectionsPerMonthGraph = new Chart(inspectionsPerMonthCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                datasets: [{
+                    label: 'Inspections Per Week',
+                    data: [3, 4, 5, 6],
+                    backgroundColor: 'rgba(231, 76, 60, 0.7)'
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+
+        // Dropdown Event Listeners
+        document.getElementById('year-select').addEventListener('change', updateGraphs);
+        document.getElementById('month-select').addEventListener('change', updateGraphs);
+
+        function updateGraphs() {
+            const selectedYear = document.getElementById('year-select').value;
+            const selectedMonth = document.getElementById('month-select').value;
+            console.log(`Year: ${selectedYear}, Month: ${selectedMonth}`);
+
+            // Update graphs based on selected year and month (update data logic goes here)
+        }
+    </script>
+</body>
+</html>

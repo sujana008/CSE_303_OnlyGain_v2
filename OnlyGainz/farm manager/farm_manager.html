@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer - Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="video-background">
+        <video autoplay muted loop id="bg-video">
+            <source src="/assets/1620050-hd_1920_1080_25fps.mp4" type="video/mp4">
+            Your browser does not support HTML5 video.
+        </video>
+    </div>
+    
+    <div class="welcome-section">
+        <div>
+            <h1 class="title">Only Gainz</h1>
+            <p class="motto">The OG loss reduction gain maximization website</p>
+        </div>
+        <div class="scroll-indicator">
+            <span>Scroll Down</span>
+            <div class="scroll-arrow"></div>
+        </div>
+    </div>
+
+    <section class="dashboard hidden">
+        <h2>Farm Manager Dashboard</h2>
+        <form>
+            <label for="farm-id">Select Farm ID:</label>
+            <select id="farm-id" name="farm-id">
+                <option value="" disabled selected>Choose Farm</option>
+                <script>
+                    for (let i = 1; i <= 20; i++) {
+                        let farmID = "Farm" + (i < 10 ? "0" + i : i);
+                        document.write(`<option value="${farmID}">${farmID}</option>`);
+                    }
+                </script>
+            </select>
+
+            <label for="field-names">Select Fields:</label>
+            <select id="field-names" name="field-names" multiple>
+                <option value="Field A">Field A</option>
+                <option value="Field B">Field B</option>
+                <script>
+                    for (let i = "A".charCodeAt(0); i <= "J".charCodeAt(0); i++) {
+                        let fieldName = "Field " + String.fromCharCode(i);
+                        document.write(`<option value="${fieldName}">${fieldName}</option>`);
+                    }
+                </script>
+            </select>
+
+            <label for="harvest-date">Harvest Date:</label>
+            <input type="date" id="harvest-date" name="harvest-date">
+
+            <label for="harvest-amount">Harvest Amount:</label>
+            <div class="amount-input">
+                <input type="number" id="harvest-amount" name="harvest-amount" placeholder="Enter amount">
+                <select id="harvest-units" name="harvest-units">
+                    <option value="kg">kg</option>
+                    <option value="ton">ton</option>
+                    <option value="lb">lb</option>
+                    <option value="bushel">bushel</option>
+                </select>
+            </div>
+
+            <label for="product-type">Product Type:</label>
+            <select id="product-type" name="product-type">
+                <option value="" disabled selected>Choose a Product</option>
+                <script>
+                    let products = [
+                        "Wheat", "Corn", "Soy", "Barley", "Tomato", "Shallots", 
+                        "Cabbage", "Cauliflower", "Spinach", "Potato", "Rice", 
+                        "Lettuce", "Broccoli", "Chilli", "Capsicum"
+                    ];
+                    products.forEach(product => {
+                        document.write(`<option value="${product}">${product}</option>`);
+                    });
+                </script>
+            </select>
+
+            <button type="submit">Submit</button>
+        </form>
+    </section>
+
+    <script>
+        window.addEventListener('scroll', () => {
+            const dashboard = document.querySelector('.dashboard');
+            const video = document.querySelector('#bg-video');
+
+            if (window.scrollY > 100) {
+                dashboard.classList.remove('hidden');
+                video.style.opacity = '0.3';
+            } else {
+                dashboard.classList.add('hidden');
+                video.style.opacity = '1';
+            }
+        });
+    </script>
+</body>
+</html>

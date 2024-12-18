@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Orders</title>
+    <link rel="stylesheet" href="../theme.css">
+    <link rel="stylesheet" href="./retailer.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="retailer-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h2>Retailer Panel</h2>
+            <nav>
+                <ul>
+                    <li><a href="all_orders.html" class="active">All Orders</a></li>
+                    <li><a href="product_details.html">Storage & Product Details</a></li>
+                    <li><a href="../login.html">Log Out</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <header class="head">
+                <h1>All Orders</h1>
+            </header>
+
+            <!-- Statistic Boxes -->
+            <section class="stats-section">
+                <div class="stat-box">
+                    <h3>Total Orders</h3>
+                    <p id="total-orders">0</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Received Orders</h3>
+                    <p id="received-orders">0</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Pending Orders</h3>
+                    <p id="pending-orders">0</p>
+                </div>
+                <div class="stat-box loss-box">
+                    <h3>Total Loss (kg)</h3>
+                    <p id="total-loss">0</p>
+                </div>
+            </section>
+
+            <!-- Graph Section -->
+            <section class="graphs-section">
+                <div class="graph">
+                    <canvas id="barGraph"></canvas>
+                </div>
+                <div class="graph">
+                    <canvas id="lineGraph"></canvas>
+                </div>
+            </section>
+
+            <!-- Place New Order Button -->
+            <div class="button-container">
+                <button class="btn-primary" id="place-order-btn">Place New Order</button>
+            </div>
+
+            <!-- All Orders Table -->
+            <section id="all-orders" class="section">
+                <h2>Order List</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order Quantity</th>
+                            <th>Order Date</th>
+                            <th>Estimated Delivery</th>
+                            <th>Order Status</th>
+                            <th>Product Name</th>
+                            <th>Received Date</th>
+                            <th>Received Amount</th>
+                            <th>Loss During Unloading</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Example Row -->
+                        <tr>
+                            <td>100</td>
+                            <td>2024-11-20</td>
+                            <td>2024-11-23</td>
+                            <td>Pending</td>
+                            <td>Tomato</td>
+                            <td></td>
+                            <td></td>
+                            <td><input type="number" placeholder="Enter Loss Amount"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal for Placing New Orders -->
+    <div id="order-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Place New Order</h3>
+            <form id="new-order-form">
+                <label for="order-quantity">Order Quantity:</label>
+                <input type="number" id="order-quantity" placeholder="Enter quantity" required>
+                <label for="product-name">Product Name:</label>
+                <input type="text" id="product-name" placeholder="Enter product name" required>
+                <button type="submit" class="btn-primary">Place Order</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Modal Logic
+        const modal = document.getElementById('order-modal');
+        const openModalBtn = document.getElementById('place-order-btn');
+        const closeModal = document.querySelector('.modal .close');
+        const form = document.getElementById('new-order-form');
+        const tableBody = document.querySelector('#all-orders table tbody');
+
+        // Open Modal
+        openModalBtn.addEventListener('click', () => {
+            modal.style.display = 'flex';
+        });
+
+        // Close Modal
+        closeModal.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        // Close Modal on Outside Click
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Handle Form Submission
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const quantity = document.getElementById('order-quantity').value;
+            const productName = document.getElementById('product-name').value;
+
+            // Get current date for Order Date
+            const orderDate = new Date();
+            const orderDateString = orderDate.toISOString().split('T')[0];
+
+            // Calculate Estimated Delivery Date
+            const deliveryDate = new Date(orderDate);
+            deliveryDate.setDate(orderDate.getDate() + 2);
+            const deliveryDateString = deliveryDate.toISOString().split('T')[0];
+
+            // Create a new row in the orders table
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${quantity}</td>
+                <td>${orderDateString}</td>
+                <td>${deliveryDateString}</td>
+                <td>Pending</td>
+                <td>${productName}</td>
+                <td></td>
+                <td></td>
+                <td><input type="number" placeholder="Enter Loss Amount"></td>
+            `;
+            tableBody.appendChild(newRow);
+
+            // Close the modal
+            modal.style.display = 'none';
+        });
+
+        // Data for Graphs
+        const monthlyOrders = [30, 40, 50, 60, 20, 10]; // Mock data for bar graph
+        const monthlyLoss = [10, 8, 12, 15, 5, 2]; // Mock data for line graph
+
+        // Initialize Graphs
+        const barCtx = document.getElementById('barGraph').getContext('2d');
+        const barGraph = new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Total Orders',
+                    data: monthlyOrders,
+                    backgroundColor: 'rgba(58, 90, 64, 0.7)',
+                    borderColor: 'rgba(58, 90, 64, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        const lineCtx = document.getElementById('lineGraph').getContext('2d');
+        const lineGraph = new Chart(lineCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Total Loss (kg)',
+                    data: monthlyLoss,
+                    backgroundColor: 'rgba(231, 76, 60, 0.2)',
+                    borderColor: 'rgba(231, 76, 60, 1)',
+                    borderWidth: 2,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        // Update Statistic Boxes (mock data)
+        document.getElementById('total-orders').textContent = 150;
+        document.getElementById('received-orders').textContent = 120;
+        document.getElementById('pending-orders').textContent = 30;
+        document.getElementById('total-loss').textContent = 42; // kg
+    </script>
+</body>
+</html>

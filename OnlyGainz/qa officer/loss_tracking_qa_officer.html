@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loss Tracking - QA Officer</title>
+    <link rel="stylesheet" href="../theme.css">
+    <link rel="stylesheet" href="./qa_officer.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="qa-officer-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h2>QA Officer Panel</h2>
+            <nav>
+                <ul>
+                    <li><a href="inspections.html">Inspections</a></li>
+                    <li><a href="loss_tracking_qa_officer.html" class="active">Loss Tracking</a></li>
+                    <li><a href="real_time_monitoring_qa_officer.html">Real Time Monitoring</a></li>
+                    <li><a href="../login.html">Log Out</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <header class="head">
+                <h1>Loss Tracking</h1>
+            </header>
+
+            <!-- Improvement Percentage Boxes -->
+            <section class="stats-section">
+                <div class="stat-box">
+                    <h3>Ring Harvest Improvement (%)</h3>
+                    <p id="ring-harvest-improvement">10%</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Handling Loss Improvement (%)</h3>
+                    <p id="handling-loss-improvement">15%</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Transportation Improvement (%)</h3>
+                    <p id="transportation-improvement">12%</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Total Improvement (%)</h3>
+                    <p id="total-improvement">20%</p>
+                </div>
+            </section>
+
+            <!-- Total Loss Over Months Graph -->
+            <section class="graphs-section">
+                <div class="graph reduced-large-graph">
+                    <canvas id="totalLossOverMonthsGraph"></canvas>
+                </div>
+            </section>
+
+            <!-- Loss Over Time Graphs (Ring Harvest, Handling, Transportation) -->
+            <section class="graphs-section">
+                <div class="graph">
+                    <canvas id="ringHarvestLossGraph"></canvas>
+                </div>
+                <div class="graph">
+                    <canvas id="handlingLossGraph"></canvas>
+                </div>
+            </section>
+
+            <!-- Loss in Storage and Transportation Graphs -->
+            <section class="graphs-section">
+                <div class="graph">
+                    <canvas id="transportationLossGraph"></canvas>
+                </div>
+                <div class="graph">
+                    <canvas id="storageLossGraph"></canvas>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Data Arrays for the graphs (Example data)
+        const products = ['Rice', 'Tomato', 'Brinjal', 'Potato', 'Cauliflower', 'Cabbage', 'Onion', 'Lettuce', 'Mushroom', 'Corn', 'Carrot', 'Pepper'];
+
+        const totalLossData = [10, 12, 9, 15, 8, 7, 5, 6, 4, 10, 7, 3];  // Total loss over months for each product
+        const ringHarvestData = [2, 4, 6, 3, 5, 7, 3, 4, 2, 5, 4, 3]; // Loss due to ring harvest
+        const handlingLossData = [3, 5, 4, 6, 7, 8, 5, 7, 6, 8, 5, 6]; // Loss during handling (load/unload)
+        const transportationLossData = [4, 6, 5, 7, 6, 9, 6, 8, 7, 9, 6, 7]; // Loss during transportation
+        const storageLossData = [5, 7, 6, 8, 7, 9, 8, 6, 9, 7, 8, 9]; // Loss in storage
+
+        // Total Loss over months Graph
+        const totalLossOverMonthsCtx = document.getElementById('totalLossOverMonthsGraph').getContext('2d');
+        const totalLossOverMonthsGraph = new Chart(totalLossOverMonthsCtx, {
+            type: 'bar',
+            data: {
+                labels: products,
+                datasets: [{
+                    label: 'Total Loss over Months',
+                    data: totalLossData,
+                    backgroundColor: 'rgba(58, 90, 64, 0.7)',
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        // Ring Harvest Loss Graph
+        const ringHarvestLossCtx = document.getElementById('ringHarvestLossGraph').getContext('2d');
+        const ringHarvestLossGraph = new Chart(ringHarvestLossCtx, {
+            type: 'line',
+            data: {
+                labels: products,
+                datasets: [{
+                    label: 'Ring Harvest Loss',
+                    data: ringHarvestData,
+                    borderColor: 'rgba(58, 90, 64, 1)',
+                    fill: false,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        // Handling Loss Graph (Load/Unload)
+        const handlingLossCtx = document.getElementById('handlingLossGraph').getContext('2d');
+        const handlingLossGraph = new Chart(handlingLossCtx, {
+            type: 'line',
+            data: {
+                labels: products,
+                datasets: [{
+                    label: 'Handling Loss (Load/Unload)',
+                    data: handlingLossData,
+                    borderColor: 'rgba(231, 76, 60, 1)',
+                    fill: false,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        // Transportation Loss Graph
+        const transportationLossCtx = document.getElementById('transportationLossGraph').getContext('2d');
+        const transportationLossGraph = new Chart(transportationLossCtx, {
+            type: 'line',
+            data: {
+                labels: products,
+                datasets: [{
+                    label: 'Transportation Loss',
+                    data: transportationLossData,
+                    borderColor: 'rgba(46, 204, 113, 1)',
+                    fill: false,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        // Storage Loss Graph
+        const storageLossCtx = document.getElementById('storageLossGraph').getContext('2d');
+        const storageLossGraph = new Chart(storageLossCtx, {
+            type: 'line',
+            data: {
+                labels: products,
+                datasets: [{
+                    label: 'Storage Loss',
+                    data: storageLossData,
+                    borderColor: 'rgba(241, 196, 15, 1)',
+                    fill: false,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        // Improvement Over Time Data (These would be dynamically updated based on the data)
+        document.getElementById('ring-harvest-improvement').textContent = '10%';
+        document.getElementById('handling-loss-improvement').textContent = '15%';
+        document.getElementById('transportation-improvement').textContent = '12%';
+        document.getElementById('total-improvement').textContent = '20%';
+    </script>
+</body>
+</html>
+
+

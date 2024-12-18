@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storage & Product Details</title>
+    <link rel="stylesheet" href="../theme.css">
+    <link rel="stylesheet" href="./wholesaler.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="retailer-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h2>Wholesaler Panel</h2>
+            <nav>
+                <ul>
+                    <li><a href="./wholesaler.html">All Orders</a></li>
+                    <li><a href="storage_product_details_wholesaler.html" class="active">Storage & Product Details</a></li>
+                    <li><a href="all_sales_order.html">All Sales Order</a></li>
+                    <li><a href="../login.html">Log Out</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <header class="head">
+                <h1>Storage & Product Details</h1>
+            </header>
+
+            <!-- Top Graphs: Sum of All Storages -->
+            <section class="graphs-section">
+                <div class="graph">
+                    <canvas id="productCapacityGraph"></canvas>
+                </div>
+                <div class="graph">
+                    <canvas id="productLossGraph"></canvas>
+                </div>
+            </section>
+
+            <!-- Stats Section -->
+            <section class="stats-section">
+                <div class="stat-box">
+                    <h3>Total Capacity</h3>
+                    <p id="total-capacity">1000 kg</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Occupied Capacity</h3>
+                    <p id="occupied-capacity">750 kg</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Remaining Usable Capacity</h3>
+                    <p id="remaining-capacity">250 kg</p>
+                </div>
+                <div class="stat-box loss-box">
+                    <h3>Wasted Capacity</h3>
+                    <p id="wasted-capacity">50 kg</p>
+                </div>
+            </section>
+
+            <!-- Select Storage and Graphs -->
+            <section class="storage-graphs-section">
+                <label for="storage-select">Select Storage Type:</label>
+                <select id="storage-select">
+                    <option value="controlled">Controlled Storage</option>
+                    <option value="silo">Silo</option>
+                    <option value="traditional">Traditional</option>
+                </select>
+                <div class="graph">
+                    <canvas id="storageProductCapacityGraph"></canvas>
+                </div>
+                <div class="graph">
+                    <canvas id="storageProductLossGraph"></canvas>
+                </div>
+            </section>
+
+            <!-- Product List Section -->
+            <section id="product-list" class="section">
+                <h2>Product List</h2>
+                <button class="btn-primary" id="add-product-btn">Add New Product</button>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Shelf Life</th>
+                            <th>Product Capacity</th>
+                            <th>Loss Due to Damage</th>
+                            <th>Add Amount</th>
+                            <th>Reduce Amount</th>
+                            <th>Reduce Loss</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows populated dynamically via JS -->
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add New Product Modal -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Add New Product</h3>
+            <form id="new-product-form">
+                <label for="product-name">Product Name:</label>
+                <input type="text" id="product-name" placeholder="Enter product name" required>
+                <label for="shelf-life">Shelf Life:</label>
+                <input type="text" id="shelf-life" placeholder="e.g., 7 days" required>
+                <label for="product-capacity">Product Capacity (kg):</label>
+                <input type="number" id="product-capacity" placeholder="Enter capacity" required>
+                <button type="submit" class="btn-primary">Add Product</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Products and Storage Types
+        const products = [
+            { name: 'Rice', shelfLife: '30 days', capacity: 100, loss: 5 },
+            { name: 'Tomato', shelfLife: '7 days', capacity: 90, loss: 10 },
+            { name: 'Brinjal', shelfLife: '10 days', capacity: 80, loss: 8 },
+            { name: 'Potato', shelfLife: '60 days', capacity: 70, loss: 4 },
+            { name: 'Cauliflower', shelfLife: '7 days', capacity: 60, loss: 6 },
+            { name: 'Cabbage', shelfLife: '7 days', capacity: 50, loss: 3 },
+            { name: 'Onion', shelfLife: '30 days', capacity: 40, loss: 2 },
+            { name: 'Lettuce', shelfLife: '5 days', capacity: 30, loss: 1 },
+            { name: 'Mushroom', shelfLife: '5 days', capacity: 20, loss: 0 },
+            { name: 'Corn', shelfLife: '30 days', capacity: 10, loss: 2 },
+            { name: 'Carrot', shelfLife: '20 days', capacity: 15, loss: 1 },
+            { name: 'Pepper', shelfLife: '20 days', capacity: 25, loss: 1 },
+        ];
+
+        const storageTypes = {
+            controlled: ['Rice', 'Tomato', 'Brinjal', 'Potato'],
+            silo: ['Cauliflower', 'Cabbage', 'Onion', 'Lettuce'],
+            traditional: ['Mushroom', 'Corn', 'Carrot', 'Pepper']
+        };
+
+        // Populate Top Graphs
+        const productCapacityGraphCtx = document.getElementById('productCapacityGraph').getContext('2d');
+        const productLossGraphCtx = document.getElementById('productLossGraph').getContext('2d');
+
+        const productCapacityGraph = new Chart(productCapacityGraphCtx, {
+            type: 'bar',
+            data: {
+                labels: products.map(p => p.name),
+                datasets: [{
+                    label: 'Total Capacity (kg)',
+                    data: products.map(p => p.capacity),
+                    backgroundColor: 'rgba(58, 90, 64, 0.7)'
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+
+        const productLossGraph = new Chart(productLossGraphCtx, {
+            type: 'bar',
+            data: {
+                labels: products.map(p => p.name),
+                datasets: [{
+                    label: 'Total Loss (kg)',
+                    data: products.map(p => p.loss),
+                    backgroundColor: 'rgba(231, 76, 60, 0.7)'
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+
+        // Populate Storage Graphs
+        const storageSelect = document.getElementById('storage-select');
+        const storageProductCapacityGraphCtx = document.getElementById('storageProductCapacityGraph').getContext('2d');
+        const storageProductLossGraphCtx = document.getElementById('storageProductLossGraph').getContext('2d');
+
+        const storageProductCapacityGraph = new Chart(storageProductCapacityGraphCtx, {
+            type: 'bar',
+            data: { labels: [], datasets: [{ label: 'Capacity (kg)', data: [] }] },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+
+        const storageProductLossGraph = new Chart(storageProductLossGraphCtx, {
+            type: 'bar',
+            data: { labels: [], datasets: [{ label: 'Loss (kg)', data: [] }] },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+
+        storageSelect.addEventListener('change', () => {
+            const selectedStorage = storageSelect.value;
+            const selectedProducts = products.filter(p => storageTypes[selectedStorage].includes(p.name));
+            storageProductCapacityGraph.data.labels = selectedProducts.map(p => p.name);
+            storageProductCapacityGraph.data.datasets[0].data = selectedProducts.map(p => p.capacity);
+            storageProductCapacityGraph.update();
+
+            storageProductLossGraph.data.labels = selectedProducts.map(p => p.name);
+            storageProductLossGraph.data.datasets[0].data = selectedProducts.map(p => p.loss);
+            storageProductLossGraph.update();
+        });
+
+        storageSelect.dispatchEvent(new Event('change')); // Populate graphs on page load
+
+        // Modal Logic
+        const modal = document.getElementById('product-modal');
+        const openModalBtn = document.getElementById('add-product-btn');
+        const closeModal = document.querySelector('.modal .close');
+        const form = document.getElementById('new-product-form');
+        const tableBody = document.querySelector('#product-list table tbody');
+
+        // Open Modal
+        openModalBtn.addEventListener('click', () => {
+            modal.style.display = 'flex';
+        });
+
+        // Close Modal
+        closeModal.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        // Close Modal on Outside Click
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Handle Form Submission
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const productName = document.getElementById('product-name').value;
+            const shelfLife = document.getElementById('shelf-life').value;
+            const productCapacity = document.getElementById('product-capacity').value;
+
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${productName}</td>
+                <td>${shelfLife}</td>
+                <td>${productCapacity} kg</td>
+                <td><input type="number" placeholder="Enter Loss"></td>
+                <td><button class="btn-action">Add</button></td>
+                <td><button class="btn-action">Reduce</button></td>
+                <td><button class="btn-action">Reduce</button></td>
+            `;
+            tableBody.appendChild(newRow);
+
+            modal.style.display = 'none'; // Close modal after adding the product
+        });
+    </script>
+</body>
+</html>

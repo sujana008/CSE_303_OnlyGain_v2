@@ -1,0 +1,109 @@
+
+:root {
+    --primary-dark: #344e41; /* Brunswick Green */
+    --primary-light: #3a5a40; /* Hunter Green */
+    --moss-green: #588157;   /* Moss Green for Sidebar */
+    --sage: #a3b18a;         /* Sage */
+    --timberwolf: #dad7cd;   /* Timberwolf */
+    --text-light: #ffffff;   /* Light text */
+    --text-dark: #000000;    /* Dark text */
+    --accent: #a3b18a;       /* Accent color (Sage) */
+    --background-light: #f9f9f9; /* Light background */
+    --border-gray: #ccc;     /* Border color */
+    /* Gradient (Optional) */
+    --background-gradient: linear-gradient(to bottom right, #344E41, #588157);
+}
+
+
+/* Global Styles */
+body {
+    font-family: 'Arial', sans-serif; /* Replace with your preferred font */
+    margin: 0;
+    padding: 0;
+    background: var(--timberwolf);
+    color: var(--text-dark);
+}
+
+/* Reusable Classes */
+.bg-dark {
+    background-color: var(--brunswick-green);
+    color: var(--text-light);
+}
+
+.bg-light {
+    background-color: var(--timberwolf);
+    color: var(--text-dark);
+}
+
+.text-dark {
+    color: var(--text-dark);
+}
+
+.text-light {
+    color: var(--text-light);
+}
+
+.accent-primary {
+    color: var(--hunter-green);
+}
+
+.accent-secondary {
+    color: var(--fern-green);
+}
+
+.border-light {
+    border: 1px solid var(--sage);
+}
+
+.border-dark {
+    border: 1px solid var(--brunswick-green);
+}
+
+/* Buttons */
+button {
+    background-color: var(--fern-green);
+    color: var(--text-light);
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: var(--hunter-green);
+}
+
+/* Header */
+header {
+    background-color: var(--brunswick-green);
+    color: var(--text-light);
+    text-align: center;
+    padding: 20px 10px;
+}
+
+/* Cards */
+.card {
+    background-color: var(--sage);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: var(--text-dark);
+}
+
+.card:hover {
+    background-color: var(--hunter-green);
+    color: var(--text-light);
+}
+
+/* Links */
+a {
+    color: var(--fern-green);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--hunter-green);
+}
